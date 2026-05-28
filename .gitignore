@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build output
+lib/
+
+# IDE
+.trae/
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Development docs
+AGENTS.md
+CLAUDE.md
+REFACTOR-PLAN.md
+CODE-SAFETY.md
+MIGRATE-MESSAGE-SYSTEM.md
+TYPE-USAGE-GUIDE.md
+qqbot-architecture.md
+api补充.md
+typescript-type-safety.md
+
+# Test
+src/test.ts
+vitest.config.ts

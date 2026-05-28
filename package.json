@@ -1,0 +1,42 @@
+{
+  "name": "qq-node-bot",
+  "version": "0.2.0",
+  "description": "QQ 官方机器人开发 SDK",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": ["lib", "LICENSE", "README.md"],
+  "engines": { "node": ">=16" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dmmdekkd/qq-node-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dmmdekkd/qq-node-bot/issues"
+  },
+  "homepage": "https://github.com/dmmdekkd/qq-node-bot#readme",
+  "scripts": {
+    "start": "node .",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "ts-node-dev -r tsconfig-paths/register src/test.ts",
+    "clean": "Remove-Item -Recurse -Force ./lib",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": ["qq", "bot", "sdk", "qqbot", "official"],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.16.0",
+    "formdata-node": "^6.0.3",
+    "ws": "^8.20.0",
+    "@noble/curves": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/ws": "^8.5.10",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.0.0"
+  }
+}
