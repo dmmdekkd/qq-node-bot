@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-05-28
+### Added
+- **撤回消息功能**
+  - 支持全场景撤回：频道、频道私信、群聊、单聊
+  - `BotEvent.recall()` - 撤回当前消息或指定消息
+  - `bot.recallMessage()` - 撤回频道消息
+  - `bot.recallGroupMessage()` - 撤回群聊消息
+  - `bot.recallPrivateMessage()` - 撤回单聊消息
+  - `bot.recallDirectMessage()` - 撤回频道私信
+  - 频道/频道私信支持 `hidetip` 参数隐藏提示小灰条
+
+### Changed
+- `e.reply()` 返回 `Promise<Message | undefined>`，支持获取消息 ID
+- `ApiClient.delete()` 支持 `params` 参数
+
 ## [0.2.0] - 2026-05-28
 ### Added
 - **引用回复功能**
@@ -62,5 +77,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - vitest 测试
 - CI/CD (GitHub Actions)
 
+[0.2.1]: https://github.com/dmmdekkd/qq-node-bot/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/dmmdekkd/qq-node-bot/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/dmmdekkd/qq-node-bot/releases/tag/v0.1.0

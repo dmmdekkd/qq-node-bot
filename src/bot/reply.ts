@@ -1,4 +1,4 @@
-import type { EventInfo, Sendable, EventPayload } from '../types'
+import type { EventInfo, Sendable, EventPayload, Message } from '../types'
 import type { MutableLoggerApi } from '../types'
 import { MessageApi } from '../api/message'
 import { InteractionApi, INTERACTION_CODE } from '../api/interaction'
@@ -19,11 +19,11 @@ export async function acknowledgeInteraction(ctx: ReplyContext, payload: EventPa
   }
 }
 
-export async function replyByEvent(ctx: ReplyContext, info: EventInfo, content: Sendable, quoteReply?: boolean): Promise<void> {
+export async function replyByEvent(ctx: ReplyContext, info: EventInfo, content: Sendable, quoteReply?: boolean): Promise<Message | undefined> {
   const text = formatSendable(content)
   if (!text || text.trim() === '') {
     ctx.logger.warn('消息内容为空，跳过发送')
-    return
+    return undefined
   }
   const refId = quoteReply ? (info.msgIdx ?? info.msgId) : undefined
   const options = refId && info.msgId
@@ -38,28 +38,28 @@ export async function replyByEvent(ctx: ReplyContext, info: EventInfo, content: 
         if (info.channelId) {
           ctx.logger.info(`send to Channel(${info.channelId}): ${text}`)
           ctx.logger.debug('send', { channelId: info.channelId, msgId: info.msgId, content })
-          await MessageApi.sendMessage(info.channelId, content, options)
+          return await MessageApi.sendMessage(info.channelId, content, options)
         }
         break
       case 'group':
         if (info.sceneId) {
           ctx.logger.info(`send to Group(${info.sceneId}): ${text}`)
           ctx.logger.debug('send', { groupOpenid: info.sceneId, msgId: info.msgId, content })
-          await MessageApi.sendGroupMessage(info.sceneId, content, options)
+          return await MessageApi.sendGroupMessage(info.sceneId, content, options)
         }
         break
       case 'private':
         if (info.userId) {
           ctx.logger.info(`send to User(${info.userId}): ${text}`)
           ctx.logger.debug('send', { userOpenid: info.userId, msgId: info.msgId, content })
-          await MessageApi.sendPrivateMessage(info.userId, content, options)
+          return await MessageApi.sendPrivateMessage(info.userId, content, options)
         }
         break
       case 'direct':
         if (info.sceneId) {
           ctx.logger.info(`send to Direct(${info.sceneId}): ${text}`)
           ctx.logger.debug('send', { guildId: info.sceneId, msgId: info.msgId, content })
-          await MessageApi.sendDirectMessage(info.sceneId, content, options)
+          return await MessageApi.sendDirectMessage(info.sceneId, content, options)
         }
         break
       case 'none':
@@ -70,4 +70,5 @@ export async function replyByEvent(ctx: ReplyContext, info: EventInfo, content: 
     const message = err instanceof Error ? err.message : String(err)
     ctx.logger.error(`发送失败: ${message}`)
   }
+  return undefined
 }

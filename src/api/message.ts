@@ -1,5 +1,5 @@
 import type { Message } from '../types'
-import type { SendMessageOptions, ChannelBody } from '../types/api'
+import type { SendMessageOptions, ChannelBody, RecallOptions } from '../types/api'
 import type { Sendable } from '../types/elements'
 import { ApiClient } from '../core/api'
 import { getFileBuffer, buildMultipartBody } from '../utils/file'
@@ -79,8 +79,22 @@ export const MessageApi = {
     return api.post(`/dms/${guildId}/messages`, body)
   },
 
-  async recallMessage(channelId: string, msgId: string): Promise<void> {
-    return api.delete(`/channels/${channelId}/messages/${msgId}`)
+  async recallMessage(channelId: string, msgId: string, options?: RecallOptions): Promise<void> {
+    const params = options?.hidetip !== undefined ? { hidetip: options.hidetip } : undefined
+    return api.delete(`/channels/${channelId}/messages/${msgId}`, params)
+  },
+
+  async recallGroupMessage(groupOpenid: string, msgId: string): Promise<void> {
+    return api.delete(`/v2/groups/${groupOpenid}/messages/${msgId}`)
+  },
+
+  async recallPrivateMessage(userOpenid: string, msgId: string): Promise<void> {
+    return api.delete(`/v2/users/${userOpenid}/messages/${msgId}`)
+  },
+
+  async recallDirectMessage(guildId: string, msgId: string, options?: RecallOptions): Promise<void> {
+    const params = options?.hidetip !== undefined ? { hidetip: options.hidetip } : undefined
+    return api.delete(`/dms/${guildId}/messages/${msgId}`, params)
   },
 
   async sendStreamPrivateMessage(userOpenid: string, content: string, options?: { maxChars?: number; interval?: number }): Promise<Message> {

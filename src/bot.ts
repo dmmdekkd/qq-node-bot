@@ -1,4 +1,5 @@
-import type { BotConfig, EventName, EventPayload, EventInfo, SelfInfo, Sendable, StatusEvent, MutableLoggerApi } from './types'
+import type { RecallOptions } from './types/api'
+import type { BotConfig, EventName, EventPayload, EventInfo, SelfInfo, Sendable, StatusEvent, MutableLoggerApi, Message } from './types'
 import type { BotEvent } from './event'
 import { GuildApi } from './api/guild'
 import { ChannelApi } from './api/channel'
@@ -130,7 +131,11 @@ export class Bot {
   sendMessage = MessageApi.sendMessage
   sendGroupMessage = MessageApi.sendGroupMessage
   sendPrivateMessage = MessageApi.sendPrivateMessage
+  sendDirectMessage = MessageApi.sendDirectMessage
   recallMessage = MessageApi.recallMessage
+  recallGroupMessage = MessageApi.recallGroupMessage
+  recallPrivateMessage = MessageApi.recallPrivateMessage
+  recallDirectMessage = MessageApi.recallDirectMessage
   sendStreamPrivateMessage = MessageApi.sendStreamPrivateMessage
   sendStreamGroupMessage = MessageApi.sendStreamGroupMessage
 
@@ -173,9 +178,9 @@ export class Bot {
     await acknowledgeInteraction(ctx, payload)
   }
 
-  private async replyByEvent(info: EventInfo, content: Sendable, quoteReply?: boolean): Promise<void> {
+  private async replyByEvent(info: EventInfo, content: Sendable, quoteReply?: boolean): Promise<Message | undefined> {
     const ctx: ReplyContext = { logger: this.logger }
-    await replyByEvent(ctx, info, content, quoteReply)
+    return replyByEvent(ctx, info, content, quoteReply)
   }
 
   private createTransport(): Transport {

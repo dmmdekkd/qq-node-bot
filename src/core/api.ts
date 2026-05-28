@@ -53,8 +53,8 @@ export class ApiClient {
     return this.http.put(path, data)
   }
 
-  async delete<T = unknown>(path: string): Promise<T> {
-    return this.http.delete(path)
+  async delete<T = unknown>(path: string, params?: Record<string, unknown>): Promise<T> {
+    return this.http.delete(path, { params })
   }
 }
 

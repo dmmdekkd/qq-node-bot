@@ -1,15 +1,17 @@
-import type { EventPayload, EventInfo, EventName, ReplyType } from '../types'
+import type { EventPayload, EventInfo, EventName, ReplyType, Message } from '../types'
 import type { MutableLoggerApi } from '../types'
 import type { Sendable } from '../types/elements'
+import type { RecallOptions } from '../types/api'
 import { EVENT_BY_NAME, MESSAGE_EVENTS, resolveEventType } from '../events'
 import { parseMessage, formatSegments } from '../message/parser'
 import { BotEvent } from '../event'
 import type { BotHandler } from '../types/internal'
+import { MessageApi } from '../api/message'
 
 export interface DispatcherContext {
   logger: MutableLoggerApi
   handlers: Map<string, Set<BotHandler>>
-  replyByEvent: (info: EventInfo, content: Sendable, quoteReply?: boolean) => Promise<void>
+  replyByEvent: (info: EventInfo, content: Sendable, quoteReply?: boolean) => Promise<Message | undefined>
   acknowledgeInteraction: (payload: EventPayload) => Promise<void>
 }
 
@@ -98,6 +100,28 @@ function extractSceneIds(replyType: ReplyType, payload: EventPayload): { sceneId
   }
 }
 
+function createRecallFn(info: EventInfo, payload: EventPayload): ((msgId: string) => Promise<void>) | undefined {
+  const msgId = payload.id
+  if (!msgId) return undefined
+
+  switch (info.replyType) {
+    case 'channel':
+      if (!payload.channel_id) return undefined
+      return (id: string) => MessageApi.recallMessage(payload.channel_id!, id)
+    case 'direct':
+      if (!payload.guild_id) return undefined
+      return (id: string) => MessageApi.recallDirectMessage(payload.guild_id!, id)
+    case 'group':
+      if (!payload.group_openid) return undefined
+      return (id: string) => MessageApi.recallGroupMessage(payload.group_openid!, id)
+    case 'private':
+      if (!payload.author?.user_openid) return undefined
+      return (id: string) => MessageApi.recallPrivateMessage(payload.author!.user_openid!, id)
+    case 'none':
+      return undefined
+  }
+}
+
 export function formatEventLog(info: EventInfo, display?: string): string {
   const sourcePart = info.sceneId ? `${info.scene}(${info.sceneId})` : info.scene
   const userPart = info.username ? `${info.username}(${info.userId})` : info.userId
@@ -119,7 +143,8 @@ export function dispatchEvent(ctx: DispatcherContext, payload: EventPayload): vo
     ctx.acknowledgeInteraction(payload)
   }
 
-  const event = new BotEvent(payload, eventName, info, (content, quoteReply) => ctx.replyByEvent(info, content, quoteReply))
+  const recallFn = createRecallFn(info, payload)
+  const event = new BotEvent(payload, eventName, info, (content, quoteReply) => ctx.replyByEvent(info, content, quoteReply), recallFn)
   ctx.handlers.get(eventName)?.forEach((fn) => {
     Promise.resolve(fn(event)).catch((err: unknown) => {
       const message = err instanceof Error ? err.message : String(err)

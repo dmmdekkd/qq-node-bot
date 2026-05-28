@@ -53,6 +53,10 @@ export interface SendMessageOptions {
   isWakeup?: boolean
 }
 
+export interface RecallOptions {
+  hidetip?: boolean
+}
+
 export interface CreateChannelPayload {
   name: string
   type: number
